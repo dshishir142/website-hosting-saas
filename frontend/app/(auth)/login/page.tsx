@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import React, { useState } from "react";
 
 type LoginForm = {
@@ -45,6 +46,9 @@ export default function Login() {
 
                     <button className=" border-1 h-[40px] w-[150px] rounded-4xl hover:bg-gray-400">Login</button>
 
+                    <div className="">
+                        Not registered? <Link href={'/signup'} className="text-blue-400 underline">Sign Up</Link>
+                    </div>
                 </div>
             </form>
         </div>
