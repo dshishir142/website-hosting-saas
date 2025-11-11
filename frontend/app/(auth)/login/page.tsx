@@ -1,23 +1,42 @@
 "use client";
 
+import axios from "axios";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { storeAuthData } from '../localStorageUtils';
 
 type LoginForm = {
-    name: string;
+    email: string;
     password: string;
 };
 
+const url = process.env.NEXT_PUBLIC_API_URL
+
 export default function Login() {
 
+    const router = useRouter();
+
     const [ user, setUser ] = useState<LoginForm>({
-        name: "",
+        email: "",
         password: "",
     })
 
-    const submit = (e: React.FormEvent<HTMLFormElement>) => {
+    const submit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(`${user.name} and ${user.password}`);
+
+        try{
+            const response = await axios.post(`${url}/user/login`, user);
+            if(response.data.status == "success"){
+                storeAuthData(response.data.token, response.data.user);
+            }else{
+                console.log(response.data.message);
+            }
+
+            router.push('/dashboard');
+        }catch(error){
+            console.log(error);
+        }
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,9 +51,10 @@ export default function Login() {
                 <div className="flex flex-col h-[300px] w-[300px] justify-center bg-gray-700 rounded-4xl space-y-3 items-center">
 
                     <input className=" h-[40px] p-[10px] rounded-3xl bg-gray-500"
-                    name="name"
-                    value={user.name}
+                    name="email"
+                    value={user.email}
                     onChange={handleChange}
+                    type="email"
                         placeholder="username" />
 
                     <input className=" h-[40px] p-[10px] rounded-3xl bg-gray-500"

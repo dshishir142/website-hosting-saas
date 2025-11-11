@@ -1,18 +1,15 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient;
+import express, { urlencoded } from 'express';
+import cors from 'cors';
+import userRoute from './routes/userRoute';
+const app = express();
 
-async function getUser(){
-    try{
-        const user = await prisma.user.findMany()
-        if(user){
-            console.log(user);
-        }else{
-            console.log("no user");
-        }
-    }catch(error){
-        console.log(error)
-    }
+const PORT = 8000;
 
-}
+app.use(cors());
+app.use(express.json());
 
-getUser();
+app.use('/user', userRoute);
+
+app.listen(PORT, ()=>{
+    console.log(`Sever is listening at port ${PORT}`);
+})
