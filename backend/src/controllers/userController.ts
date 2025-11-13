@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import { generateToken } from "../jwtmiddleware";
+import { stat } from "fs";
 const prisma = new PrismaClient
 
 export const getUsers = async (req: Request, res: Response) => {
@@ -82,6 +83,32 @@ export const loginUser = async (req: Request, res: Response) => {
         res.json({
             status: 'error',
             message: 'Internal server error',
+        })
+    }
+}
+
+
+export const setSubDomainName = async (req: Request, res: Response)=>{
+    try{
+        const { subdomain } = req.body;
+        const dataInDb = await prisma.user.findFirst({
+            where: {
+                subdomain: subdomain,
+            }
+        })
+
+        if(dataInDb){
+            res.json({
+                status: 'error',
+                message: 'this subdomain name already exists',
+            })
+        }
+
+    }catch(err){
+        console.log(err);
+        res.json({
+            status: "error",
+            message: "Internal server error",
         })
     }
 }
