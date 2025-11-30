@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { storeAuthData } from '../localStorageUtils';
+import { useUser } from "@/app/userContext";
 
 type LoginForm = {
     email: string;
@@ -16,8 +17,9 @@ const url = process.env.NEXT_PUBLIC_API_URL
 export default function Login() {
 
     const router = useRouter();
+    const {setUser} = useUser();
 
-    const [ user, setUser ] = useState<LoginForm>({
+    const [ loginUser, setloginUser ] = useState<LoginForm>({
         email: "",
         password: "",
     })
@@ -26,13 +28,16 @@ export default function Login() {
         e.preventDefault();
 
         try{
-            const response = await axios.post(`${url}/user/login`, user);
+            const response = await axios.post(`${url}/user/login`, loginUser);
             if(response.data.status == "success"){
-                storeAuthData(response.data.token, response.data.user);
+                
+            const user = response.data.user;
+            const token = response.data.token;
+                storeAuthData(token, user);
+                setUser({...user, token});
             }else{
                 console.log(response.data.message);
             }
-
             router.push('/dashboard');
         }catch(error){
             console.log(error);
@@ -41,7 +46,7 @@ export default function Login() {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setUser((prev) => ({...prev, [name] : value}));
+        setloginUser((prev) => ({...prev, [name] : value}));
     }
 
     return (
@@ -52,14 +57,14 @@ export default function Login() {
 
                     <input className=" h-[40px] p-[10px] rounded-3xl bg-gray-500"
                     name="email"
-                    value={user.email}
+                    value={loginUser.email}
                     onChange={handleChange}
                     type="email"
                         placeholder="username" />
 
                     <input className=" h-[40px] p-[10px] rounded-3xl bg-gray-500"
                     name="password"
-                    value={user.password}
+                    value={loginUser.password}
                     onChange={handleChange}
                     type="password"
                         placeholder="password" />

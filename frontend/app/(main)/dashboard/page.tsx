@@ -2,7 +2,7 @@
 
 import { useUser } from "@/app/userContext";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const url = process.env.NEXT_PUBLIC_API_URL;
 
@@ -12,22 +12,22 @@ export default function Page() {
     const [domainName, setDomainName] = useState<string>("");
     const [error, setError] = useState<string | null>(null);
 
-    const handleSubmit = async () =>{
+    const handleSubmit = async () => {
 
-        if(domainName == ""){
+        if (domainName == "") {
             setError("Sub Domain name cannot be empty");
             return;
-        }else{
+        } else {
             setError(null);
         }
 
-        try{
+        try {
             console.log(domainName);
-            const response = await axios.post(`${url}/user/subdomain`, {domainName});
-            if(response.data.status == "error"){
+            const response = await axios.post(`${url}/user/subdomain`, { domainName });
+            if (response.data.status == "error") {
                 setError(response.data.message);
             }
-        }catch(err: any){
+        } catch (err: any) {
             setError(err.message);
         }
     }
@@ -35,38 +35,44 @@ export default function Page() {
         setDomainName(e.target.value);
     }
 
+    if(!hydrated){
+        return (
+            <>Loading data...</>
+        )
+    }
+
     return (
         <>
             <div className="flex items-center justify-center">
-                {user != null ? (
+                {user ? (
                     <div className="space-y-2">
-                        {user.subdomain != null ? (
+                        {user.subdomain == null ? (
                             <>
                                 <div>Choose subdomain</div>
-                                <input className=" h-[40px] p-[10px] rounded-3xl bg-gray-500"
+                                <input
+                                    className="h-[40px] p-[10px] rounded-3xl bg-gray-500"
                                     name="subdomain"
                                     onChange={handleChange}
-                                    placeholder="subdomain" />
+                                    placeholder="subdomain"
+                                />
 
-                                    <div className="text-red-500">{error}
-                                    </div>
+                                <div className="text-red-500">{error}</div>
 
-                                <button onClick={handleSubmit}
-                                className=" border-1 h-[40px] w-[150px] rounded-4xl hover:bg-gray-400"
-                                >Submit</button>
+                                <button
+                                    onClick={handleSubmit}
+                                    className="border-1 h-[40px] w-[150px] rounded-4xl hover:bg-gray-400"
+                                >
+                                    Submit
+                                </button>
                             </>
                         ) : (
-                            <>{user.subdomain}</>
-                        )
-                    }
+                            <div>Your subdomain: {user.subdomain}</div>
+                        )}
                     </div>
-                    
-
                 ) : (
-                    <div>
-                        Loading data
-                        </div>
-                )}
+                    <div>No user</div>
+                )
+                }
 
 
 
