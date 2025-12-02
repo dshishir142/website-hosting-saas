@@ -3,12 +3,13 @@
 import { useUser } from "@/app/userContext";
 import axios from "axios";
 import { useState } from "react";
+import type { User } from "@/app/userContext";
 
 const url = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Page() {
 
-    const { user, hydrated } = useUser();
+    const { user, hydrated, setUser } = useUser();
     const [domainName, setDomainName] = useState<string>("");
     const [error, setError] = useState<string | null>(null);
 
@@ -22,11 +23,12 @@ export default function Page() {
         }
 
         try {
-            console.log(domainName);
-            const response = await axios.post(`${url}/user/subdomain`, { domainName });
+            const response = await axios.post(`${url}/user/subdomain`, { domainName, user });
             if (response.data.status == "error") {
                 setError(response.data.message);
             }
+            const updatedUser: User = {...user, subdomain : domainName}
+            setUser(updatedUser);
         } catch (err: any) {
             setError(err.message);
         }
@@ -48,12 +50,12 @@ export default function Page() {
                     <div className="space-y-2">
                         {user.subdomain == null ? (
                             <>
-                                <div>Choose subdomain</div>
+                                <div>Choose subdomain Name</div>
                                 <input
                                     className="h-[40px] p-[10px] rounded-3xl bg-gray-500"
                                     name="subdomain"
                                     onChange={handleChange}
-                                    placeholder="subdomain"
+                                    placeholder="subdomain name only..."
                                 />
 
                                 <div className="text-red-500">{error}</div>

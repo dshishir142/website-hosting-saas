@@ -23,11 +23,13 @@ export const getUsers = async (req: Request, res: Response) => {
 export const createUser = async (req: Request, res: Response) => {
     try {
         const { name, email, password } = req.body;
-        const user = await prisma.user.create({data: {
-            name: name,
-            email: email,
-            password: password,
-        }});
+        const user = await prisma.user.create({
+            data: {
+                name: name,
+                email: email,
+                password: password,
+            }
+        });
         if (user) {
             res.json({
                 status: 'success',
@@ -44,7 +46,7 @@ export const createUser = async (req: Request, res: Response) => {
 }
 
 export const loginUser = async (req: Request, res: Response) => {
-    try{
+    try {
 
         const { email, password } = req.body;
         const dataInDb = await prisma.user.findFirst({
@@ -54,7 +56,7 @@ export const loginUser = async (req: Request, res: Response) => {
             }
         })
 
-        if(dataInDb){
+        if (dataInDb) {
 
             const token = generateToken(dataInDb.id);
             console.log(`Token is ${token}`);
@@ -72,14 +74,14 @@ export const loginUser = async (req: Request, res: Response) => {
                 user: safeUser,
                 token: token,
             })
-        }else{
+        } else {
             res.json({
-            status: 'error',
-            message: 'Invalid credentials',
-        })
+                status: 'error',
+                message: 'Invalid credentials',
+            })
         }
 
-    }catch(error){
+    } catch (error) {
         res.json({
             status: 'error',
             message: 'Internal server error',
@@ -88,23 +90,35 @@ export const loginUser = async (req: Request, res: Response) => {
 }
 
 
-export const setSubDomainName = async (req: Request, res: Response)=>{
-    try{
-        const { subdomain } = req.body;
+export const setSubDomainName = async (req: Request, res: Response) => {
+    try {
+        const { user: { email }, domainName } = req.body;
+        console.log(domainName);
         const dataInDb = await prisma.user.findFirst({
             where: {
-                subdomain: subdomain,
+                subdomain: domainName,
             }
         })
-
-        if(dataInDb){
+        console.log(dataInDb);
+        if (dataInDb) {
             res.json({
                 status: 'error',
                 message: 'this subdomain name already exists',
             })
         }
+        const setSubDomain = await prisma.user.update({
+            where: {email : email},
+            data: {subdomain: domainName},
+        })
+        if(setSubDomain){
+            res.json({
+                status: 'success',
+                message: 'Successfully created subdomain name',
+                data: setSubDomain,
+            })
+        }
 
-    }catch(err){
+    } catch (err) {
         console.log(err);
         res.json({
             status: "error",
