@@ -44,6 +44,9 @@ importers:
 
   apps/tenant-site:
     dependencies:
+      axios:
+        specifier: ^1.13.2
+        version: 1.13.2
       next:
         specifier: 16.0.8
         version: 16.0.8(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
