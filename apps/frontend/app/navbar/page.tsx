@@ -2,13 +2,19 @@
 import Link from "next/link";
 import { logout } from "../(auth)/localStorageUtils";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export default function NavBar(){
     const router = useRouter()
 
-    const handleLogout = () =>{
-        logout();
-        router.push('/login');
+    const handleLogout = async () =>{
+        const logoutUser = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/user/logout`, {}, {withCredentials: true});
+        
+        if(logoutUser.data.status == 'success'){
+            logout();
+            router.push('/login');
+        }
+
     }
 
     return (

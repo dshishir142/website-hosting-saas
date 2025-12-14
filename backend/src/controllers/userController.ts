@@ -45,6 +45,29 @@ export const createUser = async (req: Request, res: Response) => {
     }
 }
 
+export const logOutUser = async (req: Request, res: Response) => {
+    try {
+        const response = res.clearCookie("token", {
+            httpOnly: true,
+            secure: false,
+            sameSite: "lax",
+            path: "/",
+        });
+        if (response) {
+            res.json({
+                status: "success",
+                message: 'User logged out successfully'
+            })
+        }
+    } catch (err) {
+        res.status(500).json({
+            status: "error",
+            message: "something went wrong in logging out user user",
+        })
+        console.log(err);
+    }
+}
+
 export const loginUser = async (req: Request, res: Response) => {
     try {
 
@@ -59,7 +82,6 @@ export const loginUser = async (req: Request, res: Response) => {
         if (dataInDb) {
 
             const token = generateToken(dataInDb.id);
-            console.log(`Token is ${token}`);
 
             const safeUser = {
                 id: dataInDb.id,
@@ -68,12 +90,20 @@ export const loginUser = async (req: Request, res: Response) => {
                 subdomain: dataInDb.subdomain || null,
             }
 
+            res.cookie("token", token, {
+                httpOnly: true,
+                secure: false,        // true after hosting
+                sameSite: "lax",
+                maxAge: 1000 * 60 * 60 * 24 * 7
+            });
+
             res.json({
                 status: "success",
                 message: "User found",
                 user: safeUser,
                 token: token,
             })
+
         } else {
             res.json({
                 status: 'error',
@@ -107,10 +137,10 @@ export const setSubDomainName = async (req: Request, res: Response) => {
             })
         }
         const setSubDomain = await prisma.user.update({
-            where: {email : email},
-            data: {subdomain: domainName},
+            where: { email: email },
+            data: { subdomain: domainName },
         })
-        if(setSubDomain){
+        if (setSubDomain) {
             res.json({
                 status: 'success',
                 message: 'Successfully created subdomain name',
