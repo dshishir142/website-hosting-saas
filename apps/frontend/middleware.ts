@@ -2,20 +2,21 @@ import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 export async function middleware(req: NextRequest) {
-  // const url = req.nextUrl.clone();
-  // const pathName = req.nextUrl.pathname;
+  const url = req.nextUrl.clone();
+  const pathName = req.nextUrl.pathname;
+  const cookieToken = req.cookies.get('token');
+  console.log(cookieToken);
 
-  // const free = ['/signup', '/login']
+  const free = ['/signup', '/login']
 
-  // if(free.includes(pathName)){
-  //   console.log("Didnt open other");
-  //   return NextResponse.next();
-  // }
+  if (free.includes(pathName)) {
+    return NextResponse.next();
+  }
 
-  // console.log(`opened ${pathName}`)
-  // url.pathname = '/login';
-  // return NextResponse.redirect(`${url}`);
-
+  if (!cookieToken) {
+    url.pathname = '/login';
+    return NextResponse.redirect(`${url}`);
+  }
   return NextResponse.next();
 }
 
