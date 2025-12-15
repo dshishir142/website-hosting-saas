@@ -1,11 +1,9 @@
-import { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const pathName = req.nextUrl.pathname;
   const cookieToken = req.cookies.get('token');
-  console.log(cookieToken);
 
   const free = ['/signup', '/login']
 
