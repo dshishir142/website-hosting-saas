@@ -8,7 +8,6 @@ export async function middleware(req: NextRequest){
     const parentAppUrl = process.env.NEXT_PUBLIC_PARENT_APP_URL
     
     if(subdomain && subdomain != hostName && subdomain != 'www' ){
-        console.log(`${subdomain}`);
         return NextResponse.next();
     }
 
