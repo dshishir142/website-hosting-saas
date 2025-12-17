@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js" 
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -17,7 +17,22 @@ model User {
   id        String   @id @default(uuid())
   email     String   @unique
   name      String
-  password String
-  subdomain String? @unique
+  password  String
+  subdomain String?  @unique
+  createdAt DateTime @default(now())
+  tenants   Tenant[]
+}
+
+model Tenant {
+  id            String @id @default(uuid())
+  user          User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String
+  subdomain     String @unique
+  name          String
+  description   String
+  logourl       String
+  contactemail  String
+  contactnumber String
+
   createdAt DateTime @default(now())
 }

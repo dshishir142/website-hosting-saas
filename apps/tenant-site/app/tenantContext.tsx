@@ -1,4 +1,4 @@
-"use client"; // Client-side context
+"use client";
 
 import { createContext, useContext, ReactNode } from "react";
 
